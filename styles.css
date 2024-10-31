@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Trebuchet MS', sans-serif;
+    background-color: #eee7e7c7;
+    line-height: 1.6;
+    animation: fadeIn 1s;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  h1 {
+    color: #EEDF7A;
+  }
+  
+  header {
+    background-color: #343131;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+  }
+  
+  nav ul {
+    list-style: none;
+    display: inline-block;
+    margin: 0;
+  }
+  
+  nav ul li {
+    display: inline;
+    margin: 0 15px;
+  }
+  
+  nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 5px;
+  }
+  
+  nav ul li a:hover {
+    background-color: #8b8b8b65;
+    border-radius: 5px;
+
+  }
+
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 2px solid white; /* for the border of the pfp */
+}
+  
+  .h1 {
+    color: #EEDF7A;
+    font-size: 1.1em;
+    animation: loading 1.5s infinite;
+  }
+  
+  @keyframes loading {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #A04747;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  ul {
+    list-style: disc;
+    margin-left: 20px;
+  }
+  
+  progress {
+    width: 100px;
+    height: 20px;
+  }
+
+  li {
+    color: #ffffff;
+  }
+  
+  .image-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .image-container img {
+    border-radius: 5px;
+    width: 350px;
+    transition: transform 0.3s ease;
+  }
+  
+  .image-container img:hover {
+    transform: scale(1.3);
+  }
+  
+  .imagestandstill {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .imagestandstill img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+  
+  .footer {
+    background-color: #343131;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+  }
+  
+  p {
+    color: #ffffff;
+  }
+
+/* UI TEMPLATES BELOW */
