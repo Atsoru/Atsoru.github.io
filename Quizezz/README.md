@@ -1,2 +1,0 @@
-# Quizezz
-Quiz game website
