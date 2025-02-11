@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest</title>
+    <style>
+        body {
+            background-color: #58543d;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('http://bit.ly/pokemonbg');
+            background-repeat: no-repeat;
+            background-size: 75%;
+            background-position: center;
+            border: 10px solid #ffffff; /* Adjust border size and color as needed */
+            box-sizing: border-box;
+            z-index: -1; /* Ensure it is behind the content */
+        }
+        .quiz-container {
+            width: 800px;
+            margin: 80px auto;
+            background-color: rgba(48, 41, 41, 0.7);
+            border-radius: 8px;
+            padding: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #ffffff;
+        }
+        .question {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+        button {
+            background-color: #3a4fd9;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #cccccc;
+        }
+        .hidden {
+            display: none;
+        }
+        #next-btn, #restart-btn {
+            display: block;
+            margin: 20px auto 0;
+        }
+        #score-container, #category-selection, #difficulty-selection {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        #timer {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #progress {
+            width: 0;
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        .difficulty {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .difficulty input[type="radio"] {
+            display: none;
+        }
+        .difficulty label {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .difficulty input[type="radio"]:checked + label {
+            background-color: #2ecc71;
+        }
+        .pokemon {
+            position: absolute;
+            bottom: 0;
+            right: 140px;
+            width: 100px;
+        }
+
+        .pokemon {
+          position: absolute;
+          left: 100px;
+          bottom: 10px;
+          width: 160px;
+        }
+       
+        .hidden {
+          display: none;
+}
+        #additional-content {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Adjust height as needed */
+        }
+        #additional-content img {
+            position: absolute;
+            bottom: 0; /* Ensure both images are at the bottom */
+        }
+        #additional-content .pokemon1 {
+            left: 50px; /* Adjust as needed */
+        }
+        #additional-content .pokemon2 {
+            right: 50px; /* Adjust as needed */
+        }
+        #additional-content p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .hearts-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .heart {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-image: url('heart.png'); /* Replace with the path to your heart image */
+            background-size: cover;
+        }
+        .heart.lost {
+            background-image: url('empty-heart.png'); /* Replace with the path to your empty heart image */
+        }
+        
+        #slash-image {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+    }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>CodeQuest</h1>
+        <div id="category-selection">
+            <h2>Select a Category:</h2>
+            <select id="category">
+                <option value="Syntax">Syntax and Basics</option>
+                <option value="Familiarty">Python Familiarty with Terms</option>
+                <option value="problem_solving">Python Problem-Solving and Debugging</option>
+            </select>
+        </div>
+        <div id="difficulty-selection">
+            <h2>Select Difficulty:</h2>
+            <div class="difficulty">
+                <input type="radio" id="easy" name="difficulty" value="easy" checked>
+                <label for="easy">Easy</label>
+            </div>
+            <div class="difficulty">
+                <input type="radio" id="medium" name="difficulty" value="medium">
+                <label for="medium">Medium</label>
+            </div>
+            <div class="difficulty">
+                <input type="radio" id="hard" name="difficulty" value="hard">
+                <label for="hard">Hard</label>
+            </div>
+        </div>
+        <div class="hearts-container" id="hearts-container">
+            <div class="heart"></div>
+            <div class="heart"></div>
+            <div class="heart"></div>
+        </div>
+        <button id="start-btn">Start Quiz</button>
+        <div id="quiz" class="hidden">
+            <div id="timer">Time: 30</div>
+            <div id="progress-bar"><div id="progress"></div></div>
+            <div id="question-container">
+                <p id="question" class="question"></p>
+                <div id="options" class="options"></div>
+            </div>
+            <button id="next-btn" disabled>Next Question</button>
+        </div>
+        <div id="additional-content" class="hidden">
+            <img class="pokemon1" src="https://pixeljoint.com/files/icons/full/dotpixelknight.gif" alt="A gif from blastoises back sprite" />
+            <img id="slash-image" src="slashimage.png" alt="slash" />
+            <img class="pokemon2" src="https://i.gifer.com/ZiAe.gif" alt="A python" />
+        </div>
+        <div id="score-container" class="hidden">
+            <h2>Quiz Completed!</h2>
+            <p>Your score: <span id="score"></span></p>
+            <span id="time-taken"></span>
+            <button id="restart-btn">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const quizQuestions = {
+    Syntax: {
+        easy: [
+            {
+                question: "What is the output of the following code? print(2 + 3 * 4)",
+                options: ["20", "14", "24", "9"],
+                correctAnswer: 1
+            },
+            {
+                question: "Which of the following variable names is invalid in Python?",
+  options: ["my_variable", "1variable", "_variable1", "myVariable"],
+  correctAnswer: 1
+            },
+            {
+                question: "What does this code print? name = 'Python' print(name[-1])",
+  options: ["P", "o", "n", "h"],
+  correctAnswer: 2
+            },
+            {
+                question: "What is the data type of the variable x? x = 10.5",
+  options: ["int", "float", "str", "bool"],
+  correctAnswer: 1
+            },
+            {
+                question: "Which of these is a comment in Python?",
+  options: ["// This is a comment", "< This is a comment >", "# This is a comment", "/* This is a comment */"],
+  correctAnswer: 2
+            },
+           
+        ],
+        medium: [
+            {
+                question: "How many times will this loop run? for i in range(2, 10, 2): print(i)",
+  options: ["4", "5", "6", "3"],
+  correctAnswer: 0
+            },
+            {
+                question: "What will the following code print? x = 15 if x % 3 == 0 and x % 5 == 0: print('FizzBuzz') elif x % 3 == 0: print('Fizz') elif x % 5 == 0: print('Buzz') else: print(x)",
+  options: ["FizzBuzz", "Fizz", "Buzz", "15"],
+  correctAnswer: 0
+            },
+            {
+               question: "What will this function return if called with calculate_area(5)? def calculate_area(radius): pi = 3.14 return pi * radius ** 2",
+  options: ["15.7", "25", "78.5", "31.4"],
+  correctAnswer: 2
+            },
+            {
+               question: "Why does this code raise an error? if True: print('Hello')",
+  options: ["Missing parentheses", "IndentationError", "SyntaxError", "Nothing is wrong"],
+  correctAnswer: 1
+            },
+            {
+                question: "What kind of error does this code raise? print(10 / 0)",
+  options: ["SyntaxError", "ZeroDivisionError", "TypeError", "ValueError"],
+  correctAnswer: 1
+            },
+           
+        ],
+        hard: [
+            {
+                question: "What does the following list comprehension do? numbers = [i**2 for i in range(5) if i % 2 == 0]",
+  options: [
+    "Creates a list of squares of all numbers from 0 to 4",
+    "Creates a list of squares of all odd numbers from 0 to 4",
+    "Creates a list of squares of all even numbers from 0 to 4",
+    "Creates a list of all numbers from 0 to 4"],
+  correctAnswer: 2
+            },
+            {
+                question: "What will happen when you run the following code? with open('example.txt', 'w') as file: file.write('Hello World!') with open('example.txt', 'r') as file: print(file.read())",
+  options: [
+    "Raises an error because you cannot open a file twice",
+    "Prints 'Hello World!'",
+    "Prints nothing",
+    "Overwrites the file with an empty string" ],
+  correctAnswer: 1
+            },
+            {
+               question: "What will the following code output? def mystery_func(a, b, *args): return sum(args) + a * b print(mystery_func(2, 3, 4, 5, 6))",
+  options: ["11", "20", "25", "39"],
+  correctAnswer: 2
+            },
+            {
+                question: "What does this code output? my_list = [1, 2, [3, 4], 5] print(my_list[2][1])",
+  options: ["2", "3", "4", "Error"],
+  correctAnswer: 2
+            },
+            {
+                question: "What does this code print? my_dict = {'a': 1, 'b': 2} print(my_dict['c'])",
+  options: ["KeyError", "None", "Error", "0"],
+  correctAnswer: 0
+            },
+        ]
+    },
+    Familiarty: {
+        easy: [
+            {
+              question: "What does 'variable' refer to in Python?",
+  options: [
+    "A function that performs an operation",
+    "A reserved keyword in Python",
+    "A container for storing data values",
+    "A Python module"],
+  correctAnswer: 2
+            },
+            {
+                question: "Which of these is a mutable data type in Python?",
+  options: ["Tuple", "List", "String", "Integer"],
+  correctAnswer: 1
+            },
+            {
+                question: "What does the == operator do in Python?",
+  options: [
+    "Assigns a value to a variable",
+    "Compares two values for equality",
+    "Adds two numbers",
+    "Checks if a value is greater"],
+  correctAnswer: 1
+            },
+            {
+                question: "Which keyword is used to define a function in Python?",
+  options: ["function", "def", "lambda", "define"],
+  correctAnswer: 1
+            },
+            {
+                question: "What is PEP in Python?",
+  options: [
+    "Python Error Protocol",
+    "Python Enhancement Proposal",
+    "Python Execution Plan",
+    "None of the above"],
+  correctAnswer: 1
+            },
+
+        ],
+        medium: [
+            {
+                question: "What is the scope of a variable defined inside a function?",
+  options: ["Global", "Local", "Module-level", "Universal"],
+  correctAnswer: 1
+            },
+            {
+                question: "Which module would you import to generate random numbers in Python?",
+  options: ["math", "random", "os", "sys"],
+  correctAnswer: 1
+            },
+            {
+                question: "What kind of error will this code raise? my_list = [1, 2, 3] print(my_list[3])",
+  options: ["SyntaxError", "IndexError", "ValueError", "KeyError"],
+  correctAnswer: 1
+            },
+            {
+                question: "What is a 'tuple' in Python?",
+  options: [
+    "A mutable sequence of items",
+    "An immutable sequence of items",
+    "A type of loop",
+    "A debugging tool"],
+  correctAnswer: 1
+            },
+            {
+                question: "What does 'duck typing' refer to in Python?",
+  options: [
+    "Using variables with animal names",
+    "Checking types of variables explicitly before using them",
+    "Determining an object’s type by its behavior or methods",
+    "A built-in function for typecasting" ],
+  correctAnswer: 2
+            }
+        ],
+        hard: [
+            {
+                question: "What is a Python decorator?",
+  options: [
+    "A special type of function that adds functionality to another function",
+    "A reserved word in Python",
+    "A data type used to store lists",
+    "A module used for GUI design"],
+  correctAnswer: 0
+
+            },
+            {
+                question: "What does the yield keyword do in Python?",
+  options: [
+    "Exits a loop",
+    "Returns a value from a generator function",
+    "Creates a new thread",
+    "Terminates a function permanently"],
+  correctAnswer: 1
+            },
+            {
+                question: "In Python, what is the purpose of the _init_ method in a class?",
+  options: [
+    "To destroy an object when it is no longer needed",
+    "To initialize the attributes of a class",
+    "To create a new instance of a module",
+    "To check if an object belongs to a class"],
+  correctAnswer: 1
+            },
+            {
+                question: "What is a Python 'metaclass'?",
+  options: [
+    "A special type of class that defines the behavior of other classes",
+    "A class that can only contain static methods",
+    "A class that inherits from multiple classes",
+    "None of the above"],
+  correctAnswer: 0
+            },
+            {
+                question: "What is the Global Interpreter Lock (GIL) in Python?",
+  options: [
+    "A feature that prevents multiple threads from executing Python bytecode at the same time",
+    "A lock mechanism for accessing global variables",
+    "A security measure for importing external modules",
+    "A debugging tool"],
+  correctAnswer: 0
+            }
+        ]
+    },
+    problem_solving: {
+        easy: [
+            {
+                question: "What is wrong with this code? print('Hello World!)",
+  options: [
+    "No indentation",
+    "Missing a closing parenthesis",
+    "Missing a semicolon",
+    "print is not a valid keyword" ],
+  correctAnswer: 1
+            },
+            {
+                question: "What will this code print? num = 10 if num < 5: print('Small') else: print('Big')",
+  options: ["Small", "Big", "Error", "Nothing"],
+  correctAnswer: 1
+            },
+            {
+                question: "What is wrong with this loop? i = 1 while i < 10: print(i)",
+  options: [
+    "Indentation error",
+    "Infinite loop",
+    "i is not updated",
+    "Both b and c" ],
+  correctAnswer: 3
+            },
+            {
+               question: "Fix the code to correctly print the sum of the numbers in the list: numbers = [1, 2, 3, 4] total = 0 for number in numbers: total = number print(total)",
+  options: [
+    "Add total += number inside the loop",
+    "Add a return statement",
+    "Use sum()",
+    "Replace total with number"],
+  correctAnswer: 0
+            },
+            {
+                question: "What does a try block do in Python?",
+  options: [
+    "Declares a loop",
+    "Handles potential errors in the code",
+    "Assigns variables dynamically",
+    "Imports external libraries"],
+  correctAnswer: 1
+            }
+        ],
+        medium: [
+            {
+                question: "The following function is intended to return the square of a number. What’s wrong? def square(num): result = num ** 2 square(5)",
+  options: [
+    "Missing parentheses",
+    "The function does not return anything",
+    "The syntax for exponentiation is wrong",
+    "There’s nothing wrong"],
+  correctAnswer: 1
+            },
+            {
+                question: "Fix this code to print 'Even' for even numbers and 'Odd' for odd numbers num = 7 if num / 2 == 0: print('Even') else: print('Odd')",
+  options: [
+    "Change / to %",
+    "Change == to !=",
+    "Add parentheses around num / 2",
+    "Replace if with elif"
+  ],
+  correctAnswer: 0
+            },
+            {
+                question: "What will this code output? fruits = ['apple', 'banana', 'cherry'] print(fruits[3])",
+  options: ["apple", "banana", "IndexError", "None"],
+  correctAnswer: 2
+            },
+            {
+                question: "Which debugging tool pauses execution at breakpoints?",
+  options: ["print()", "pdb", "traceback", "None of the above"],
+  correctAnswer: 1
+            },
+            {
+                question: "What does traceback help you with in debugging?",
+  options: [
+    "It lists the files in the working directory",
+    "It displays the exact sequence of calls that led to an error",
+    "It stops execution of code at runtime",
+    "None of the above"
+  ],
+  correctAnswer: 1
+            }
+        ],
+        hard: [
+            {
+                question: "What will happen when this code runs, and how would you fix it? my_dict = {'a': 1, 'b': 2} print(my_dict['c'])",
+  options: [
+    "Prints None",
+    "Raises a KeyError",
+    "Adds 'c': None to the dictionary",
+    "No output"
+  ],
+  correctAnswer: 1
+            },
+            {
+                question: "What is wrong with this code? def countdown(n): print(n) countdown(n - 1) countdown(5)",
+  options: [
+    "The function is missing a base case",
+    "The function should return, not print",
+    "The recursion depth is incorrect",
+    "There’s nothing wrong"
+  ],
+  correctAnswer: 0
+            },
+            {
+               question: "Why does this code raise an error, and how can we fix it? with open('data.txt', 'r') as file: file.write('New Data')",
+  options: [
+    "The file does not exist",
+    "The file is opened in the wrong mode",
+    "The write() method is incorrect",
+    "Indentation error"
+  ],
+  correctAnswer: 1
+            },
+            {
+                question: "How do you disable debugging messages without removing logging statements in production?",
+  options: [
+    "Set logging.basicConfig(level=logging.WARNING)",
+    "Use print() instead",
+    "Remove the logging import",
+    "None of the above"],
+  correctAnswer: 0
+            },
+            {
+                question: "What is the purpose of a traceback in error messages?",
+  options: [
+    "To fix errors automatically",
+    "To provide detailed information about where and why an error occurred",
+    "To terminate the program safely",
+    "To create log files"],
+  correctAnswer: 1
+            }
+        ]
+    }
+};
+
+</script>
+
+<script type="module">
+    // Import Supabase client
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+
+    const SUPABASE_URL = 'https://zgzqqkakzblbydujjyfv.supabase.co'; // Replace with your Supabase URL
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnenFxa2FremJsYnlkdWpqeWZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MDE0NjQsImV4cCI6MjA1MjA3NzQ2NH0.SYpEHyb7fArFhUgjEJ290LTt5JzMQrch5BYMDkIhybk'; // Replace with your Supabase Anon Key
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentQuestion = 0;
+    let selectedAnswer = null;
+    let timer;
+    let timeLeft = 30;
+    let totalTimeElapsed = 0; // Variable to track total time elapsed
+    let category;
+    let difficulty;
+    let questions;
+    let hearts = 3;
+    let score = 0;
+
+    const categorySelect = document.getElementById('category');
+    const difficultyInputs = document.querySelectorAll('input[name="difficulty"]');
+    const startBtn = document.getElementById('start-btn');
+    const quizContainer = document.getElementById('quiz');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreContainer = document.getElementById('score-container');
+    const scoreEl = document.getElementById('score');
+    const timeTakenEl = document.getElementById('time-taken');
+    const restartBtn = document.getElementById('restart-btn');
+    const timerEl = document.getElementById('timer');
+    const progressEl = document.getElementById('progress');
+    const slashImage = document.getElementById('slash-image');
+    const heartsContainer = document.getElementById('hearts-container');
+
+    startBtn.addEventListener('click', startQuiz);
+    nextBtn.addEventListener('click', nextQuestion);
+    restartBtn.addEventListener('click', restartQuiz);
+
+    function startQuiz() {
+        category = categorySelect.value;
+        difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+        questions = quizQuestions[category][difficulty];
+        currentQuestion = 0;
+        score = 0;
+        hearts = 3;
+        totalTimeElapsed = 0; // Reset total time elapsed
+        document.getElementById('category-selection').style.display = 'none';
+        document.getElementById('difficulty-selection').style.display = 'none';
+        startBtn.style.display = 'none';
+        quizContainer.style.display = 'block';
+        loadQuestion();
+        startTimer();
+        resetHearts();
+        document.getElementById('additional-content').classList.remove('hidden'); // Show characters and snake
+    }
+
+    function loadQuestion() {
+        const question = questions[currentQuestion];
+        questionEl.textContent = question.question;
+        optionsEl.innerHTML = '';
+        question.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.addEventListener('click', () => selectAnswer(index));
+            optionsEl.appendChild(button);
+        });
+        nextBtn.disabled = true;
+        updateProgressBar();
+    }
+
+    function selectAnswer(index) {
+        selectedAnswer = index;
+        const buttons = optionsEl.getElementsByTagName('button');
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].style.backgroundColor = i === index ? '#2ecc71' : '#3498db';
+        }
+        nextBtn.disabled = false;
+    }
+
+    function nextQuestion() {
+        if (selectedAnswer === questions[currentQuestion].correctAnswer) {
+            score++;
+        } else {
+            loseHeart();
+        }
+        currentQuestion++;
+        selectedAnswer = null;
+
+        if (currentQuestion < questions.length && hearts > 0) {
+            loadQuestion();
+            resetTimer();
+        } else {
+            showScore();
+        }
+    }
+
+    async function showScore() {
+        clearInterval(timer);
+        quizContainer.style.display = 'none';
+        scoreContainer.style.display = 'block';
+        scoreEl.textContent = `${score} out of ${questions.length}`;
+        timeTakenEl.textContent = `Time taken: ${totalTimeElapsed} seconds`;
+
+        // Get the current user
+        const { data: { user }, error } = await supabase.auth.getUser();
+
+        if (user) {
+            // Store the quiz results in Supabase with category and difficulty
+            const { data, error } = await supabase
+                .from('quiz_results')
+                .insert([
+                    {
+                        user_id: user.id,
+                        score: score,
+                        total_questions: questions.length,
+                        time_taken: totalTimeElapsed,
+                        difficulty: difficulty, // Add difficulty level
+                        category: category // Add category
+                    }
+                ]);
+
+            if (error) {
+                console.error("Error storing quiz results:", error.message);
+            } else {
+                console.log("Quiz results stored successfully:", data);
+            }
+        } else {
+            console.error("User not authenticated");
+        }
+    }
+
+    function restartQuiz() {
+        scoreContainer.style.display = 'none';
+        document.getElementById('category-selection').style.display = 'block';
+        document.getElementById('difficulty-selection').style.display = 'block';
+        startBtn.style.display = 'block';
+        resetTimer();
+        resetHearts();
+        document.getElementById('additional-content').classList.add('hidden'); // Hide characters and snake
+    }
+
+    function startTimer() {
+        clearInterval(timer); // Clear any existing timer
+        timeLeft = 30;
+        timerEl.textContent = `Time: ${timeLeft}`;
+        timer = setInterval(() => {
+            timeLeft--;
+            totalTimeElapsed++; // Increment total time elapsed
+            timerEl.textContent = `Time: ${timeLeft}`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        clearInterval(timer);
+        startTimer();
+    }
+
+    function updateProgressBar() {
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        progressEl.style.width = `${progress}%`;
+    }
+
+    function resetHearts() {
+        hearts = 3;
+        heartsContainer.innerHTML = '';
+        for (let i = 0; i < hearts; i++) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heartsContainer.appendChild(heart);
+        }
+    }
+
+    function loseHeart() {
+        if (hearts > 0) {
+            hearts--;
+            const heart = heartsContainer.children[hearts];
+            heart.classList.add('lost');
+            showSlashImage();
+            if (hearts === 0) {
+                endQuiz();
+            }
+        }
+    }
+
+    function showSlashImage() {
+        slashImage.classList.remove('hidden');
+        setTimeout(() => {
+            slashImage.classList.add('hidden');
+        }, 500); // Show the slash image for 500 milliseconds
+    }
+
+    function endQuiz() {
+        clearInterval(timer);
+        quizContainer.style.display = 'none';
+        scoreContainer.style.display = 'block';
+        scoreEl.textContent = `${score} out of ${questions.length}`;
+        timeTakenEl.textContent = `Time taken: ${totalTimeElapsed} seconds`;
+    }
+</script>
+
+</body>
+</html>

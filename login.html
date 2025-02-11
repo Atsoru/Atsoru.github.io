@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Login Container */
+        .login-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Title Styling */
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+            color: #2575fc;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #6a11cb;
+        }
+
+        input[type="submit"] {
+            padding: 12px;
+            background-color: #2575fc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #6a11cb;
+        }
+
+        /* Footer Styling */
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-footer a {
+            color: #2575fc;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error Message Styling */
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        /* Additional Styles */
+        .form-footer p {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Login to CodeQuest</h2>
+        <form id="loginForm">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="Enter your email">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Enter your password">
+
+            <input type="submit" value="Login">
+        </form>
+        <div class="form-footer">
+            <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+        </div>
+        <div id="errorMessage" class="error" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+
+        const SUPABASE_URL = 'https://zgzqqkakzblbydujjyfv.supabase.co'; // Replace with your Supabase URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnenFxa2FremJsYnlkdWpqeWZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MDE0NjQsImV4cCI6MjA1MjA3NzQ2NH0.SYpEHyb7fArFhUgjEJ290LTt5JzMQrch5BYMDkIhybk'; // Replace with your Supabase Anon Key
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Sign in with email and password
+                const { data: { user }, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+
+                if (error) {
+                    console.error("Login error:", error.message);
+                    document.getElementById("errorMessage").textContent = error.message;
+                    document.getElementById("errorMessage").style.display = "block";
+                    return;
+                }
+
+                // Redirect to the dashboard or home page
+                window.location.href = "quiz.html"; // Adjust the target page as needed
+            } catch (err) {
+                console.error("Unexpected error:", err);
+                document.getElementById("errorMessage").textContent = "An unexpected error occurred. Please try again.";
+                document.getElementById("errorMessage").style.display = "block";
+            }
+        });
+    </script>
+
+</body>
+</html>
